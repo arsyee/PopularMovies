@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, response.toString());
                         adapter.setMovieList(movieList);
                         adapter.notifyDataSetChanged();
-                        movies.setAdapter(adapter);
                     }
                 },
                 new Response.ErrorListener() {

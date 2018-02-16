@@ -4,15 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="hu.fallen.popularmovies.MainActivity">
-
-    <GridView
-        android:id="@+id/gr_movies"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stretchMode="columnWidth"
-        android:numColumns="2">
-
-    </GridView>
+    tools:context="hu.fallen.popularmovies.DetailActivity">
 
 </android.support.constraint.ConstraintLayout>

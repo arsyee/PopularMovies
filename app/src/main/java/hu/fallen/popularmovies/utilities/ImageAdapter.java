@@ -1,11 +1,13 @@
 package hu.fallen.popularmovies.utilities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.android.volley.RequestQueue;
@@ -22,6 +24,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import hu.fallen.popularmovies.DetailActivity;
 import hu.fallen.popularmovies.R;
 
 public class ImageAdapter extends BaseAdapter {
@@ -56,32 +59,21 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     @Override
-    public void registerDataSetObserver(DataSetObserver dataSetObserver) {
-
-    }
-
-    @Override
-    public void unregisterDataSetObserver(DataSetObserver dataSetObserver) {
-
-    }
-
-    @Override
     public int getCount() {
-        int count = movieList == null ? 4 : movieList.size();
+        int count = movieList == null ? 0 : movieList.size();
         Log.d(TAG, "count: " + Integer.toString(count));
         return count;
     }
 
     @Override
     public Object getItem(int i) {
-        Log.d(TAG, "getItem called");
+        if (movieList != null && movieList.size() > i) return movieList.get(i);
         return null;
     }
 
     @Override
     public long getItemId(int i) {
-        Log.d(TAG, "getItemId called");
-        return 0;
+        return i;
     }
 
     @Override
@@ -90,20 +82,29 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(final int i, View view, ViewGroup viewGroup) {
         NetworkImageView imageView;
         if (view == null) {
-            // if it's not recycled, initialize some attributes
             imageView = new NetworkImageView(mContext);
-            // imageView.setLayoutParams(new GridView.LayoutParams(300, 300));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            // imageView.setPadding(8, 8, 8, 8);
+            imageView.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            imageView.setAdjustViewBounds(true);
+            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d(TAG, String.format("Movie %d has been selected.", i));
+                    Intent intent = new Intent();
+                    intent.putExtra("MovieDetails", (MovieDetails) getItem(i));
+                    intent.setClass(mContext, DetailActivity.class);
+                    mContext.startActivity(intent);
+                }
+            });
         } else {
             imageView = (NetworkImageView) view;
         }
         if (movieList != null) {
-            Log.d(TAG, String.format("Movie %d is %s", i, movieList.get(i).original_title));
-            imageView.setImageUrl("https://image.tmdb.org/t/p/w185" + movieList.get(i).poster_path, mImageLoader);
+            Log.d(TAG, String.format("Movie %d is %s", i, ((MovieDetails) getItem(i)).original_title));
+            imageView.setImageUrl("https://image.tmdb.org/t/p/w185" + ((MovieDetails) getItem(i)).poster_path, mImageLoader);
         } else {
             Log.d(TAG, String.format("movieList is empty for %d", i));
         }

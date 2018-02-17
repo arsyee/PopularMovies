@@ -17,9 +17,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-
-import java.util.Locale;
-
 import hu.fallen.popularmovies.databinding.ActivityDetailBinding;
 import hu.fallen.popularmovies.utilities.BitmapLruCache;
 import hu.fallen.popularmovies.utilities.MovieDetails;
@@ -31,9 +28,6 @@ public class DetailActivity extends AppCompatActivity {
 
     private String api_key = null;
 
-    RequestQueue mRequestQueue = null;
-    ImageLoader mImageLoader = null;
-
     private final Gson gson = new Gson();
 
     @Override
@@ -41,12 +35,13 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         final ActivityDetailBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
-        mRequestQueue = Volley.newRequestQueue(this);
-        mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(BitmapLruCache.getCacheSize(this)));
+        RequestQueue mRequestQueue = Volley.newRequestQueue(this);
+        ImageLoader mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(BitmapLruCache.getCacheSize(this)));
 
         MovieDetails movieDetails = getIntent().getParcelableExtra("MovieDetails");
         binding.setMovieDetails(movieDetails);
         binding.ivPoster.setImageUrl(SharedConstants.BASE_POSTER_URL + "/w185" + movieDetails.poster_path, mImageLoader);
+        binding.ivPoster.setContentDescription(getString(R.string.poster_description, movieDetails.original_title));
 
         if (api_key == null) {
             api_key = "api_key=" + getString(R.string.tmdb_api_key);

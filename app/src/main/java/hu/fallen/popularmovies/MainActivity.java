@@ -39,11 +39,10 @@ public class MainActivity extends AppCompatActivity
     private static final String TOP_RATED = "movie/top_rated";
     private String api_key = null;
 
-    RequestQueue mRequestQueue = null;
-    ImageLoader mImageLoader = null;
+    private RequestQueue mRequestQueue;
+    private ImageAdapter adapter;
 
     private final Gson gson = new Gson();
-    private ImageAdapter adapter;
     private SharedPreferences preferences;
 
     @Override
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         mRequestQueue = Volley.newRequestQueue(this);
-        mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(BitmapLruCache.getCacheSize(this)));
+        ImageLoader mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(BitmapLruCache.getCacheSize(this)));
 
         api_key = "api_key=" + getString(R.string.tmdb_api_key);
 
@@ -70,6 +69,11 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        refreshMovies();
     }
 
     private void refreshMovies() {
@@ -117,10 +121,5 @@ public class MainActivity extends AppCompatActivity
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        refreshMovies();
     }
 }

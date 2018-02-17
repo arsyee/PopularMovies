@@ -9,23 +9,20 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 
 import java.util.List;
 
 import hu.fallen.popularmovies.DetailActivity;
+import hu.fallen.popularmovies.R;
 
 public class ImageAdapter extends BaseAdapter {
 
     private static final String TAG = ImageAdapter.class.getSimpleName();
 
-
-    private Context mContext;
-    @SuppressWarnings("FieldCanBeLocal")
-    private RequestQueue mRequestQueue;
-    private ImageLoader mImageLoader;
+    private final Context mContext;
+    private final ImageLoader mImageLoader;
 
     private List<MovieDetails> movieList = null;
 
@@ -84,17 +81,19 @@ public class ImageAdapter extends BaseAdapter {
         }
         // setup unique properties
         if (movieList != null && movieList.size() > i) {
+            final MovieDetails movieDetails = (MovieDetails) getItem(i);
             networkImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Log.d(TAG, String.format("Movie %d has been selected.", i));
                     Intent intent = new Intent();
-                    intent.putExtra("MovieDetails", (MovieDetails) getItem(i));
+                    intent.putExtra("MovieDetails", movieDetails);
                     intent.setClass(mContext, DetailActivity.class);
                     mContext.startActivity(intent);
                 }
             });
-            networkImageView.setImageUrl(SharedConstants.BASE_POSTER_URL + "/w185" + ((MovieDetails) getItem(i)).poster_path, mImageLoader);
+            networkImageView.setContentDescription(mContext.getString(R.string.poster_description, movieDetails.original_title));
+            networkImageView.setImageUrl(SharedConstants.BASE_POSTER_URL + "/w185" + movieDetails.poster_path, mImageLoader);
         } else {
             networkImageView.setOnClickListener(null);
             networkImageView.setImageUrl(null, null);

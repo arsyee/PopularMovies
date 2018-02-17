@@ -3,16 +3,13 @@ package hu.fallen.popularmovies.utilities;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-@SuppressWarnings("WeakerAccess")
 public class MovieDetails implements Parcelable {
-    private static final String TAG = MovieDetails.class.getSimpleName();
-
-    public String poster_path;
-    public String overview;
-    public String release_date;
-    public int id;
-    public String original_title;
-    public double vote_average;
+    public final String poster_path;
+    public final String overview;
+    private final String release_date;
+    public final int id;
+    public final String original_title;
+    private final double vote_average;
 
     public String getReleaseYear() {
         return release_date.substring(0, 4);
@@ -20,10 +17,6 @@ public class MovieDetails implements Parcelable {
 
     public String getRating() {
         return Double.toString(vote_average) + "/10";
-    }
-
-    public String getPosterDescription() {
-        return original_title;
     }
 
     // Parcelable implementation
@@ -57,6 +50,7 @@ public class MovieDetails implements Parcelable {
         parcel.writeDouble(vote_average);
     }
 
+    @SuppressWarnings("unused") // required by Parcelable interface
     public static final Creator<MovieDetails> CREATOR = new Creator<MovieDetails>() {
         @Override
         public MovieDetails createFromParcel(Parcel in) {

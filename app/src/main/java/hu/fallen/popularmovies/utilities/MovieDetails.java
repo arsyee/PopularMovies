@@ -2,49 +2,44 @@ package hu.fallen.popularmovies.utilities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
+@SuppressWarnings("WeakerAccess")
 public class MovieDetails implements Parcelable {
     private static final String TAG = MovieDetails.class.getSimpleName();
 
-    String poster_path;
-    String original_title;
+    public String poster_path;
+    public String overview;
+    public String release_date;
+    public int id;
+    public String original_title;
+    public double vote_average;
 
-    private MovieDetails() {}
+    public String getReleaseYear() {
+        return release_date.substring(0, 4);
+    }
+
+    public String getRating() {
+        return Double.toString(vote_average) + "/10";
+    }
+
+    public String getPosterDescription() {
+        return original_title;
+    }
+
+    // Parcelable implementation
 
     private MovieDetails(Parcel in) {
         poster_path = in.readString();
+        overview = in.readString();
+        release_date = in.readString();
+        id = in.readInt();
         original_title = in.readString();
+        vote_average = in.readDouble();
     }
 
     @Override
     public String toString() {
         return original_title;
-    }
-
-    public static List<MovieDetails> buildList(JSONObject response) {
-        List<MovieDetails> result = new ArrayList<>();
-        try {
-            JSONArray resultArray = response.getJSONArray("results");
-            for (int i = 0; i < resultArray.length(); ++i) {
-                JSONObject object = resultArray.getJSONObject(i);
-                MovieDetails movieDetails = new MovieDetails();
-                movieDetails.original_title = object.getString("original_title");
-                movieDetails.poster_path = object.getString("poster_path");
-                Log.d(TAG, "Movie found: " + movieDetails);
-                result.add(movieDetails);
-            }
-        } catch (JSONException e) {
-            Log.d(TAG, e.getMessage());
-        }
-        return result;
     }
 
     @Override
@@ -55,7 +50,11 @@ public class MovieDetails implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(poster_path);
+        parcel.writeString(overview);
+        parcel.writeString(release_date);
+        parcel.writeInt(id);
         parcel.writeString(original_title);
+        parcel.writeDouble(vote_average);
     }
 
     public static final Creator<MovieDetails> CREATOR = new Creator<MovieDetails>() {

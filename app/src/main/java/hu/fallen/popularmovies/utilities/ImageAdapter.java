@@ -2,7 +2,6 @@ package hu.fallen.popularmovies.utilities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,25 +10,16 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import hu.fallen.popularmovies.DetailActivity;
-import hu.fallen.popularmovies.R;
 
 public class ImageAdapter extends BaseAdapter {
 
-    private static final String TAG = ImageView.class.getSimpleName();
+    private static final String TAG = ImageAdapter.class.getSimpleName();
 
 
     private Context mContext;
@@ -83,13 +73,18 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
-        NetworkImageView imageView;
-        if (view == null) {
-            imageView = new NetworkImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            imageView.setAdjustViewBounds(true);
-            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            imageView.setOnClickListener(new View.OnClickListener() {
+        NetworkImageView networkImageView;
+        if (view == null) { // create a new NetworkImageView and setup properties
+            networkImageView = new NetworkImageView(mContext);
+            networkImageView.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            networkImageView.setAdjustViewBounds(true);
+            networkImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        } else { // recycle view, we don't need to set common properties
+            networkImageView = (NetworkImageView) view;
+        }
+        // setup unique properties
+        if (movieList != null && movieList.size() > i) {
+            networkImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Log.d(TAG, String.format("Movie %d has been selected.", i));
@@ -99,21 +94,17 @@ public class ImageAdapter extends BaseAdapter {
                     mContext.startActivity(intent);
                 }
             });
+            networkImageView.setImageUrl(SharedConstants.BASE_POSTER_URL + "/w185" + ((MovieDetails) getItem(i)).poster_path, mImageLoader);
         } else {
-            imageView = (NetworkImageView) view;
-        }
-        if (movieList != null) {
-            Log.d(TAG, String.format("Movie %d is %s", i, ((MovieDetails) getItem(i)).original_title));
-            imageView.setImageUrl("https://image.tmdb.org/t/p/w185" + ((MovieDetails) getItem(i)).poster_path, mImageLoader);
-        } else {
+            networkImageView.setOnClickListener(null);
+            networkImageView.setImageUrl(null, null);
             Log.d(TAG, String.format("movieList is empty for %d", i));
         }
-        return imageView;
+        return networkImageView;
     }
 
     @Override
     public int getItemViewType(int i) {
-        Log.d(TAG, String.format("getItemViewType(%d) called", i));
         return 0;
     }
 
@@ -124,8 +115,7 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public boolean isEmpty() {
-        Log.d(TAG, "isEmpty called");
-        return false;
+        return movieList == null || movieList.isEmpty();
     }
 
     @Override

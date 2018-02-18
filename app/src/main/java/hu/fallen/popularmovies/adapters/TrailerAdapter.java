@@ -1,4 +1,4 @@
-package hu.fallen.popularmovies.utilities;
+package hu.fallen.popularmovies.adapters;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -29,7 +29,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
         mContext = context.getApplicationContext();
     }
 
-    public void setTrailerUrls(List<TrailerInfo> trailerInfos) {
+    public void setTrailerInfos(List<TrailerInfo> trailerInfos) {
         mTrailerInfos = trailerInfos;
         notifyDataSetChanged();
     }
@@ -51,7 +51,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
         Log.d(TAG, String.format("onCreateViewHolder called: %d", count++));
         View view;
         if (viewType == VIEWTYPE_SEPARATOR) {
-            view = new View(mContext);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.separator, parent, false);
         } else {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_trailer, parent, false);
         }

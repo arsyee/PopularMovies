@@ -87,7 +87,7 @@ public class ImageAdapter extends BaseAdapter {
                 public void onClick(View view) {
                     Log.d(TAG, String.format("Movie %d has been selected.", i));
                     Intent intent = new Intent();
-                    intent.putExtra("MovieDetails", movieDetails);
+                    intent.putExtra(SharedConstants.MOVIE_DETAILS_EXTRA, movieDetails);
                     intent.setClass(mContext, DetailActivity.class);
                     mContext.startActivity(intent);
                 }

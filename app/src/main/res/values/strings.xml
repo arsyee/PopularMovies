@@ -8,11 +8,14 @@
     <string-array name="sort_by_entries">
         <item>Popular</item>
         <item>Top Rated</item>
+        <item>Local favorites</item>
     </string-array>
 
+    <string name="sort_by_default_value">popular</string>
     <string-array name="sort_by_entry_values">
         <item>popular</item>
         <item>top_rated</item>
+        <item>local_favorites</item>
     </string-array>
 
     <string name="settings">Settings</string>
@@ -22,4 +25,5 @@
     <string name="trailers">Trailers:</string>
     <string name="play_button">Play button</string>
     <string name="movie_not_found">Movie not found</string>
+    <string name="reviews">Reviews</string>
 </resources>

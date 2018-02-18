@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,8 +36,8 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final String POPULAR = "movie/popular";
-    private static final String TOP_RATED = "movie/top_rated";
+    private static final String ENDPOINT_POPULAR = "popular";
+    private static final String ENDPOINT_TOPRATED = "top_rated";
     private String api_key = null;
 
     private RequestQueue mRequestQueue;
@@ -77,33 +78,47 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void refreshMovies() {
-        String sort_by = POPULAR;
-        switch (preferences.getString("sort_by", "popular")) {
+        String sort_by;
+        String prefSortBy = preferences.getString("sort_by", "popular");
+        switch (prefSortBy) {
+            case "local_favorites":
+                sort_by = null;
+                break;
             case "top_rated":
-                sort_by = TOP_RATED;
+                sort_by = ENDPOINT_TOPRATED;
+                break;
+            case "popular":
+            default:
+                sort_by = ENDPOINT_POPULAR;
                 break;
         }
-        String url = SharedConstants.BASE_URL + sort_by + "?" + api_key;
-        Log.d(TAG, url);
+        Log.d(TAG, String.format("Selected preference: %s, sort_by: %s", prefSortBy, sort_by));
+        if (sort_by == null) {
+            adapter.setMovieList(new ArrayList<MovieDetails>());
+            adapter.notifyDataSetChanged();
+        } else {
+            String url = SharedConstants.BASE_URL_MOVIE + sort_by + "?" + api_key;
+            Log.d(TAG, url);
 
-        mRequestQueue.add(new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG, response);
-                        JsonElement resultArray = gson.fromJson(response, JsonObject.class).get("results");
-                        List<MovieDetails> movieList = Arrays.asList(gson.fromJson(resultArray, MovieDetails[].class));
-                        adapter.setMovieList(movieList);
-                        adapter.notifyDataSetChanged();
+            mRequestQueue.add(new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d(TAG, response);
+                            JsonElement resultArray = gson.fromJson(response, JsonObject.class).get("results");
+                            List<MovieDetails> movieList = Arrays.asList(gson.fromJson(resultArray, MovieDetails[].class));
+                            adapter.setMovieList(movieList);
+                            adapter.notifyDataSetChanged();
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, error.toString());
+                        }
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, error.toString());
-                    }
-                }
-        ));
+            ));
+        }
     }
 
     @Override

@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="hu.fallen.popularmovies.MainActivity">
+    tools:context="hu.fallen.popularmovies.MainActivity"
+    android:id="@+id/gr_movies"
+    android:stretchMode="columnWidth"
+    android:numColumns="2">
 
-    <GridView
-        android:id="@+id/gr_movies"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stretchMode="columnWidth"
-        android:numColumns="2">
-
-    </GridView>
-
-</android.support.constraint.ConstraintLayout>
+</GridView>

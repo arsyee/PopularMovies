@@ -19,4 +19,7 @@
     <string name="sort_by">Sort by</string>
     <string name="min_duration">%d min</string>
     <string name="poster_description">Movie poster for %s</string>
+    <string name="trailers">Trailers:</string>
+    <string name="play_button">Play button</string>
+    <string name="movie_not_found">Movie not found</string>
 </resources>

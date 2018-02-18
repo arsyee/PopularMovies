@@ -3,13 +3,14 @@ package hu.fallen.popularmovies.utilities;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+@SuppressWarnings("WeakerAccess") // public access required for Data Binding
 public class MovieDetails implements Parcelable {
     public final String poster_path;
     public final String overview;
-    private final String release_date;
+    public final String release_date;
     public final int id;
     public final String original_title;
-    private final double vote_average;
+    public final double vote_average;
 
     public String getReleaseYear() {
         return release_date.substring(0, 4);

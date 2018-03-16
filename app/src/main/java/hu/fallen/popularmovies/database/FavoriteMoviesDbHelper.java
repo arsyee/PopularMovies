@@ -70,11 +70,13 @@ public class FavoriteMoviesDbHelper extends SQLiteOpenHelper {
         return movieDetailsList;
     }
 
-    public void flipMovieDetails(MovieDetails movieDetails) {
+    public boolean flipMovieDetails(MovieDetails movieDetails) {
         if (movieDetailsIsInDB(movieDetails.id)) {
             removeMovieDetails(movieDetails.id);
+            return false;
         } else {
             addMovieDetails(movieDetails);
+            return true;
         }
     }
 

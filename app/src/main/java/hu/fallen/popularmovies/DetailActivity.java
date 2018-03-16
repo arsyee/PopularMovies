@@ -51,6 +51,8 @@ public class DetailActivity extends AppCompatActivity {
     private ActivityDetailBinding mBinding;
     private MovieDetails mMovieDetails;
 
+    private Toast detailToast = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +63,7 @@ public class DetailActivity extends AppCompatActivity {
 
         Intent incomingIntent = getIntent();
         if (incomingIntent == null || !incomingIntent.hasExtra(SharedConstants.MOVIE_DETAILS_EXTRA)) {
-            Toast.makeText(this, getString(R.string.movie_not_found), Toast.LENGTH_LONG).show();
+            showToast(getString(R.string.movie_not_found));
             finish();
             return; // if intent has no extra, I have no information at all on what movie this is
         }
@@ -69,7 +71,7 @@ public class DetailActivity extends AppCompatActivity {
         Log.d(TAG, String.format("setMovieDetails will be called on mBinding: %s", mMovieDetails));
         if (mMovieDetails == null) {
             Log.d(TAG, String.format("mMovieDetails is null, will it finish?"));
-            Toast.makeText(this, getString(R.string.movie_not_found), Toast.LENGTH_LONG).show();
+            showToast(getString(R.string.movie_not_found));
             finish();
             return; // if intent has no extra, I have no information at all on what movie this is
         }
@@ -79,6 +81,7 @@ public class DetailActivity extends AppCompatActivity {
         mBinding.ivPoster.setContentDescription(getString(R.string.poster_description, mMovieDetails.original_title));
         api_key = "api_key=" + getString(R.string.tmdb_api_key);
         updateRuntime();
+        updateFavourite();
 
         trailerAdapter = new TrailerAdapter(DetailActivity.this);
         final RecyclerView trailers = mBinding.rvTrailers;
@@ -155,8 +158,29 @@ public class DetailActivity extends AppCompatActivity {
         mRequestQueue.add(movieRequest);
     }
 
+    private void updateFavourite() {
+        MovieDetails movieDetails = mBinding.getMovieDetails();
+        FavoriteMoviesDbHelper dbHelper = new FavoriteMoviesDbHelper(this);
+        if (dbHelper.movieDetailsIsInDB(movieDetails.id)) {
+            mBinding.btFavorite.setText(R.string.unmark_as_favorite);
+        } else {
+            mBinding.btFavorite.setText(R.string.mark_as_favorite);
+        }
+    }
+
     public void flipFavourite(View view) {
         FavoriteMoviesDbHelper dbHelper = new FavoriteMoviesDbHelper(this);
-        dbHelper.flipMovieDetails(mMovieDetails);
+        if (dbHelper.flipMovieDetails(mMovieDetails)) {
+            showToast(getResources().getString(R.string.favorite_added, mMovieDetails.original_title));
+        } else {
+            showToast(getResources().getString(R.string.favorite_removed, mMovieDetails.original_title));
+        }
+        updateFavourite();
+    }
+
+    private void showToast(String message) {
+        if (detailToast != null) detailToast.cancel();
+        detailToast = Toast.makeText(this, message, Toast.LENGTH_LONG);
+        detailToast.show();
     }
 }

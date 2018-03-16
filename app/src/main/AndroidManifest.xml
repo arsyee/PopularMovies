@@ -37,6 +37,12 @@
                 android:name="android.support.PARENT"
                 android:value=".MainActivity" />
         </activity>
+        
+        <provider
+            android:authorities="hu.fallen.popularmovies"
+            android:name="hu.fallen.popularmovies.database.MoviesContentProvider"
+            android:exported="false" />
+
     </application>
 
 </manifest>

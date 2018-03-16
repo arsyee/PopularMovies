@@ -1,7 +1,9 @@
 package hu.fallen.popularmovies;
 
+import android.content.AsyncTaskLoader;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import hu.fallen.popularmovies.database.FavoriteMoviesContract;
+import hu.fallen.popularmovies.database.FavoriteMoviesDbHelper;
 import hu.fallen.popularmovies.utilities.BitmapLruCache;
 import hu.fallen.popularmovies.utilities.ImageAdapter;
 import hu.fallen.popularmovies.utilities.MovieDetails;
@@ -62,7 +66,11 @@ public class MainActivity extends AppCompatActivity
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences.registerOnSharedPreferenceChangeListener(this);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         refreshMovies();
     }
 
@@ -94,7 +102,8 @@ public class MainActivity extends AppCompatActivity
         }
         Log.d(TAG, String.format("Selected preference: %s, sort_by: %s", prefSortBy, sort_by));
         if (sort_by == null) {
-            adapter.setMovieList(new ArrayList<MovieDetails>());
+            FavoriteMoviesDbHelper dbHelper = new FavoriteMoviesDbHelper(this);
+            adapter.setMovieList(dbHelper.getMovieDetails());
             adapter.notifyDataSetChanged();
         } else {
             String url = SharedConstants.BASE_URL_MOVIE + sort_by + "?" + api_key;

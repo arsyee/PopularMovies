@@ -82,10 +82,11 @@ public class ImageAdapter extends BaseAdapter {
         // setup unique properties
         if (movieList != null && movieList.size() > i) {
             final MovieDetails movieDetails = (MovieDetails) getItem(i);
+            Log.d(TAG, String.format("Drawing %s", movieDetails));
             networkImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d(TAG, String.format("Movie %d has been selected.", i));
+                    Log.d(TAG, String.format("Movie %d has been selected: %s", i, movieDetails));
                     Intent intent = new Intent();
                     intent.putExtra(SharedConstants.MOVIE_DETAILS_EXTRA, movieDetails);
                     intent.setClass(mContext, DetailActivity.class);

@@ -2,9 +2,11 @@ package hu.fallen.popularmovies.utilities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 @SuppressWarnings("WeakerAccess") // public access required for Data Binding
 public class MovieDetails implements Parcelable {
+    private static final String TAG = MovieDetails.class.getSimpleName();
     public final String poster_path;
     public final String overview;
     public final String release_date;
@@ -23,6 +25,7 @@ public class MovieDetails implements Parcelable {
     // Parcelable implementation
 
     private MovieDetails(Parcel in) {
+        Log.d(TAG,String.format("MovieDetails will be created from parcel: %d %d", in.dataSize(), in.dataPosition()));
         poster_path = in.readString();
         overview = in.readString();
         release_date = in.readString();
@@ -33,7 +36,7 @@ public class MovieDetails implements Parcelable {
 
     @Override
     public String toString() {
-        return original_title;
+        return String.format("%d %f %s %s %s %s", id, vote_average, original_title, release_date, poster_path, overview);
     }
 
     @Override
@@ -43,6 +46,7 @@ public class MovieDetails implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        Log.d(TAG, String.format("Writing to parcel: %d %d", parcel.dataSize(), parcel.dataPosition()));
         parcel.writeString(poster_path);
         parcel.writeString(overview);
         parcel.writeString(release_date);

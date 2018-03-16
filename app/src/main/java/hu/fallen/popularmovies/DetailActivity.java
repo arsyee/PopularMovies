@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -26,6 +27,7 @@ import java.util.List;
 
 import hu.fallen.popularmovies.adapters.ReviewInfo;
 import hu.fallen.popularmovies.adapters.TrailerAdapter;
+import hu.fallen.popularmovies.database.FavoriteMoviesDbHelper;
 import hu.fallen.popularmovies.databinding.ActivityDetailBinding;
 import hu.fallen.popularmovies.utilities.BitmapLruCache;
 import hu.fallen.popularmovies.utilities.MovieDetails;
@@ -47,6 +49,7 @@ public class DetailActivity extends AppCompatActivity {
     private final Gson gson = new Gson();
     private RequestQueue mRequestQueue;
     private ActivityDetailBinding mBinding;
+    private MovieDetails mMovieDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +65,18 @@ public class DetailActivity extends AppCompatActivity {
             finish();
             return; // if intent has no extra, I have no information at all on what movie this is
         }
-        MovieDetails movieDetails = incomingIntent.getParcelableExtra(SharedConstants.MOVIE_DETAILS_EXTRA);
-        mBinding.setMovieDetails(movieDetails);
+        mMovieDetails = incomingIntent.getParcelableExtra(SharedConstants.MOVIE_DETAILS_EXTRA);
+        Log.d(TAG, String.format("setMovieDetails will be called on mBinding: %s", mMovieDetails));
+        if (mMovieDetails == null) {
+            Log.d(TAG, String.format("mMovieDetails is null, will it finish?"));
+            Toast.makeText(this, getString(R.string.movie_not_found), Toast.LENGTH_LONG).show();
+            finish();
+            return; // if intent has no extra, I have no information at all on what movie this is
+        }
+        mBinding.setMovieDetails(mMovieDetails);
 
-        mBinding.ivPoster.setImageUrl(SharedConstants.BASE_POSTER_URL + "/w185" + movieDetails.poster_path, mImageLoader);
-        mBinding.ivPoster.setContentDescription(getString(R.string.poster_description, movieDetails.original_title));
+        mBinding.ivPoster.setImageUrl(SharedConstants.BASE_POSTER_URL + "/w185" + mMovieDetails.poster_path, mImageLoader);
+        mBinding.ivPoster.setContentDescription(getString(R.string.poster_description, mMovieDetails.original_title));
         api_key = "api_key=" + getString(R.string.tmdb_api_key);
         updateRuntime();
 
@@ -145,4 +155,8 @@ public class DetailActivity extends AppCompatActivity {
         mRequestQueue.add(movieRequest);
     }
 
+    public void flipFavourite(View view) {
+        FavoriteMoviesDbHelper dbHelper = new FavoriteMoviesDbHelper(this);
+        dbHelper.flipMovieDetails(mMovieDetails);
+    }
 }

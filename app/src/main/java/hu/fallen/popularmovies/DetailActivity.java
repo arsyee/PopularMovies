@@ -191,7 +191,7 @@ public class DetailActivity extends AppCompatActivity {
         }
         if (isFavorite) {
             resolver.delete(detailsUri, null, null);
-            showToast(getResources().getString(R.string.favorite_added, mMovieDetails.original_title));
+            showToast(getResources().getString(R.string.favorite_removed, mMovieDetails.original_title));
         } else {
             ContentValues values = new ContentValues();
             values.put(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_POSTER_PATH, movieDetails.poster_path);
@@ -201,7 +201,7 @@ public class DetailActivity extends AppCompatActivity {
             values.put(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE, movieDetails.original_title);
             values.put(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE, movieDetails.vote_average);
             resolver.insert(detailsUri, values);
-            showToast(getResources().getString(R.string.favorite_removed, mMovieDetails.original_title));
+            showToast(getResources().getString(R.string.favorite_added, mMovieDetails.original_title));
         }
         updateFavorite();
     }

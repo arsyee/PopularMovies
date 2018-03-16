@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,7 +39,7 @@ public class MoviesContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        final SQLiteDatabase db = dbHelper.getReadableDatabase();
         int match = sUriMatcher.match(uri);
         Cursor cursor = null;
         switch (match) {
@@ -82,12 +83,32 @@ public class MoviesContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        return null;
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case MOVIE_WITH_ID:
+                long id = db.insert(FavoriteMoviesContract.MovieEntry.TABLE_NAME, null, values);
+                if (id <= 0) throw new SQLiteException(String.format("Failed to insert row"));
+                return uri;
+            default:
+                throw new UnsupportedOperationException(String.format("Unsupported uri: %s", uri));
+        }
     }
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case MOVIE_WITH_ID:
+                String id = uri.getLastPathSegment();
+                return db.delete(
+                        FavoriteMoviesContract.MovieEntry.TABLE_NAME,
+                        FavoriteMoviesContract.MovieEntry.COLUMN_NAME_ID + " LIKE ?",
+                        new String[] { id });
+            default:
+                throw new UnsupportedOperationException(String.format("Unsupported uri: %s", uri));
+        }
     }
 
     @Override

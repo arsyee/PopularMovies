@@ -13,12 +13,12 @@ import java.util.List;
 
 import hu.fallen.popularmovies.utilities.MovieDetails;
 
-public class FavoriteMoviesDbHelper extends SQLiteOpenHelper {
+class FavoriteMoviesDbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "Movies.db";
     private static final String TAG = FavoriteMoviesDbHelper.class.getSimpleName();
 
-    public FavoriteMoviesDbHelper(Context context) {
+    FavoriteMoviesDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

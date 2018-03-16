@@ -1,6 +1,7 @@
 package hu.fallen.popularmovies;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
@@ -31,7 +32,6 @@ import java.util.List;
 import hu.fallen.popularmovies.adapters.ReviewInfo;
 import hu.fallen.popularmovies.adapters.TrailerAdapter;
 import hu.fallen.popularmovies.database.FavoriteMoviesContract;
-import hu.fallen.popularmovies.database.FavoriteMoviesDbHelper;
 import hu.fallen.popularmovies.databinding.ActivityDetailBinding;
 import hu.fallen.popularmovies.utilities.BitmapLruCache;
 import hu.fallen.popularmovies.utilities.MovieDetails;
@@ -178,10 +178,29 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     public void flipFavourite(View view) {
-        FavoriteMoviesDbHelper dbHelper = new FavoriteMoviesDbHelper(this);
-        if (dbHelper.flipMovieDetails(mMovieDetails)) {
+        MovieDetails movieDetails = mBinding.getMovieDetails();
+        ContentResolver resolver = getContentResolver();
+        Uri detailsUri = FavoriteMoviesContract.BASE_CONTENT_URI.buildUpon().appendPath(FavoriteMoviesContract.PATH_MOVIE).appendPath(Integer.toString(movieDetails.id)).build();
+        Cursor details = resolver.query(
+                detailsUri,
+                null, null, null, null);
+        boolean isFavorite = false;
+        if (details != null) {
+            if (details.getCount() > 0) isFavorite = true;
+            details.close();
+        }
+        if (isFavorite) {
+            resolver.delete(detailsUri, null, null);
             showToast(getResources().getString(R.string.favorite_added, mMovieDetails.original_title));
         } else {
+            ContentValues values = new ContentValues();
+            values.put(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_POSTER_PATH, movieDetails.poster_path);
+            values.put(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_OVERVIEW, movieDetails.overview);
+            values.put(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_RELEASE_DATE, movieDetails.release_date);
+            values.put(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_ID, movieDetails.id);
+            values.put(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE, movieDetails.original_title);
+            values.put(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE, movieDetails.vote_average);
+            resolver.insert(detailsUri, values);
             showToast(getResources().getString(R.string.favorite_removed, mMovieDetails.original_title));
         }
         updateFavorite();

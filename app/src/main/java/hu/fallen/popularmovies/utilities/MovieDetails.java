@@ -22,6 +22,15 @@ public class MovieDetails implements Parcelable {
         return Double.toString(vote_average) + "/10";
     }
 
+    public MovieDetails(int id, String poster_path, String overview, String release_date, String original_title, double vote_average) {
+        this.poster_path = poster_path;
+        this.overview = overview;
+        this.release_date = release_date;
+        this.id = id;
+        this.original_title = original_title;
+        this. vote_average = vote_average;
+    }
+
     // Parcelable implementation
 
     private MovieDetails(Parcel in) {

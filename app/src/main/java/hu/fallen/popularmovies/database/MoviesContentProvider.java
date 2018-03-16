@@ -38,7 +38,6 @@ public class MoviesContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        List<MovieDetails> movieDetailsList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         int match = sUriMatcher.match(uri);
         switch (match) {

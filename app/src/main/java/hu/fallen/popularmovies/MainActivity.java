@@ -1,9 +1,11 @@
 package hu.fallen.popularmovies;
 
 import android.content.AsyncTaskLoader;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -102,8 +104,32 @@ public class MainActivity extends AppCompatActivity
         }
         Log.d(TAG, String.format("Selected preference: %s, sort_by: %s", prefSortBy, sort_by));
         if (sort_by == null) {
-            FavoriteMoviesDbHelper dbHelper = new FavoriteMoviesDbHelper(this);
-            adapter.setMovieList(dbHelper.getMovieDetails());
+            ContentResolver resolver = getContentResolver();
+            Uri favoritesUri = FavoriteMoviesContract.BASE_CONTENT_URI.buildUpon().appendEncodedPath(FavoriteMoviesContract.PATH_FAVORITE).build();
+            Cursor favorites = resolver.query(
+                    favoritesUri,
+                    null, null, null, null);
+            if (favorites == null) {
+                Log.d(TAG, String.format("ContentResolver returned null for %s", favoritesUri.toString()));
+                return;
+            }
+            Log.d(TAG, String.format("ContentResolver returned %d favorites", favorites.getCount()));
+            List<MovieDetails> movieDetails = new ArrayList<>();
+            try {
+                while (favorites.moveToNext()) {
+                    movieDetails.add(new MovieDetails(
+                            favorites.getInt(favorites.getColumnIndex(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_ID)),
+                            favorites.getString(favorites.getColumnIndex(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_POSTER_PATH)),
+                            favorites.getString(favorites.getColumnIndex(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_OVERVIEW)),
+                            favorites.getString(favorites.getColumnIndex(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_RELEASE_DATE)),
+                            favorites.getString(favorites.getColumnIndex(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE)),
+                            favorites.getDouble(favorites.getColumnIndex(FavoriteMoviesContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE))
+                    ));
+                }
+            } finally {
+                favorites.close();
+            }
+            adapter.setMovieList(movieDetails);
             adapter.notifyDataSetChanged();
         } else {
             String url = SharedConstants.BASE_URL_MOVIE + sort_by + "?" + api_key;

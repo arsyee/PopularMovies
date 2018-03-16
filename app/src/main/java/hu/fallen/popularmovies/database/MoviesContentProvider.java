@@ -10,18 +10,13 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import hu.fallen.popularmovies.utilities.MovieDetails;
-
 public class MoviesContentProvider extends ContentProvider {
-    public static final int FAVORITE = 100;
-    public static final int MOVIE_WITH_ID = 101;
+    private static final int FAVORITE = 100;
+    private static final int MOVIE_WITH_ID = 101;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
-    public static UriMatcher buildUriMatcher() {
+    private static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(FavoriteMoviesContract.AUTHORITY, FavoriteMoviesContract.PATH_FAVORITE, FAVORITE);
         uriMatcher.addURI(FavoriteMoviesContract.AUTHORITY, FavoriteMoviesContract.PATH_MOVIE + "/#", MOVIE_WITH_ID);
@@ -41,7 +36,7 @@ public class MoviesContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         final SQLiteDatabase db = dbHelper.getReadableDatabase();
         int match = sUriMatcher.match(uri);
-        Cursor cursor = null;
+        Cursor cursor;
         switch (match) {
             case FAVORITE:
                 cursor = db.query(
@@ -88,7 +83,7 @@ public class MoviesContentProvider extends ContentProvider {
         switch (match) {
             case MOVIE_WITH_ID:
                 long id = db.insert(FavoriteMoviesContract.MovieEntry.TABLE_NAME, null, values);
-                if (id <= 0) throw new SQLiteException(String.format("Failed to insert row"));
+                if (id <= 0) throw new SQLiteException("Failed to insert row");
                 return uri;
             default:
                 throw new UnsupportedOperationException(String.format("Unsupported uri: %s", uri));

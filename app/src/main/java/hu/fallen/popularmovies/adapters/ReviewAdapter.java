@@ -1,6 +1,6 @@
 package hu.fallen.popularmovies.adapters;
 
-import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,19 +15,15 @@ import hu.fallen.popularmovies.R;
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder> {
     private static final String TAG = TrailerAdapter.class.getSimpleName();
 
-    private static final int VIEWTYPE_REVIEW = 0;
-    private static final int VIEWTYPE_SEPARATOR = 1;
+    private static final int VIEW_TYPE_REVIEW = 0;
+    private static final int VIEW_TYPE_SEPARATOR = 1;
 
-    private final Context mContext;
+    private List<ReviewInfo> mReviewInfo;
 
-    private List<ReviewInfo> mReviewInfos;
+    public ReviewAdapter() { }
 
-    public ReviewAdapter(Context context) {
-        mContext = context.getApplicationContext();
-    }
-
-    public void setReviewInfos(List<ReviewInfo> trailerInfos) {
-        mReviewInfos = trailerInfos;
+    public void setReviewInfo(List<ReviewInfo> trailerInfo) {
+        mReviewInfo = trailerInfo;
         notifyDataSetChanged();
     }
 
@@ -38,16 +34,17 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return mReviewInfos == null || mReviewInfos.isEmpty() ? 0 : mReviewInfos.size() * 2 - 1;
+        return mReviewInfo == null || mReviewInfo.isEmpty() ? 0 : mReviewInfo.size() * 2 - 1;
     }
 
     private int count = 0;
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d(TAG, String.format("onCreateViewHolder called: %d", count++));
         View view;
-        if (viewType == VIEWTYPE_SEPARATOR) {
+        if (viewType == VIEW_TYPE_SEPARATOR) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.separator, parent, false);
         } else {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_review, parent, false);
@@ -56,12 +53,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        if (getItemViewType(position) == VIEWTYPE_SEPARATOR) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        if (getItemViewType(position) == VIEW_TYPE_SEPARATOR) {
             Log.d(TAG, String.format("onBindViewHolder called: %d (separator)", position));
             return; // no change needed
         }
-        final ReviewInfo reviewInfo = mReviewInfos.get(position / 2);
+        final ReviewInfo reviewInfo = mReviewInfo.get(position / 2);
         String trailerTitle = reviewInfo.toString();
         Log.d(TAG, String.format("onBindViewHolder called: %d (%s)", position, trailerTitle));
         ((TextView) holder.itemView.findViewById(R.id.tv_author)).setText(reviewInfo.author);
@@ -70,7 +67,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
 
     @Override
     public int getItemViewType(int i) {
-        return i % 2 == 0 ? VIEWTYPE_REVIEW : VIEWTYPE_SEPARATOR;
+        return i % 2 == 0 ? VIEW_TYPE_REVIEW : VIEW_TYPE_SEPARATOR;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

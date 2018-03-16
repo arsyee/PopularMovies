@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final String ENDPOINT_POPULAR = "popular";
-    private static final String ENDPOINT_TOPRATED = "top_rated";
+    private static final String ENDPOINT_TOP_RATED = "top_rated";
     private String api_key = null;
 
     private RequestQueue mRequestQueue;
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity
                 sort_by = null;
                 break;
             case "top_rated":
-                sort_by = ENDPOINT_TOPRATED;
+                sort_by = ENDPOINT_TOP_RATED;
                 break;
             case "popular":
             default:

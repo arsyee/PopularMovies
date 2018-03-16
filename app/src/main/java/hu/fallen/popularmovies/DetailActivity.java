@@ -74,7 +74,7 @@ public class DetailActivity extends AppCompatActivity {
         mMovieDetails = incomingIntent.getParcelableExtra(SharedConstants.MOVIE_DETAILS_EXTRA);
         Log.d(TAG, String.format("setMovieDetails will be called on mBinding: %s", mMovieDetails));
         if (mMovieDetails == null) {
-            Log.d(TAG, String.format("mMovieDetails is null, will it finish?"));
+            Log.d(TAG, "mMovieDetails is null, will it finish?");
             showToast(getString(R.string.movie_not_found));
             finish();
             return; // if intent has no extra, I have no information at all on what movie this is
@@ -91,36 +91,36 @@ public class DetailActivity extends AppCompatActivity {
         final RecyclerView trailers = mBinding.rvTrailers;
         trailers.setLayoutManager(new LinearLayoutManager(DetailActivity.this));
         trailers.setAdapter(trailerAdapter);
-        updateList(ENDPOINT_VIDEOS, trailerAdapter,
+        updateList(ENDPOINT_VIDEOS,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, response);
                         JsonElement resultArray = gson.fromJson(response, JsonObject.class).get("results");
-                        List<TrailerInfo> infos = Arrays.asList(gson.fromJson(resultArray, TrailerInfo[].class));
-                        trailerAdapter.setTrailerInfos(infos);
+                        List<TrailerInfo> info = Arrays.asList(gson.fromJson(resultArray, TrailerInfo[].class));
+                        trailerAdapter.setTrailerInfo(info);
                     }
                 }
         );
 
-        reviewAdapter = new ReviewAdapter(DetailActivity.this);
+        reviewAdapter = new ReviewAdapter();
         final RecyclerView reviews = mBinding.rvReviews;
         reviews.setLayoutManager(new LinearLayoutManager(DetailActivity.this));
         reviews.setAdapter(reviewAdapter);
-        updateList(ENDPOINT_REVIEWS, reviewAdapter,
+        updateList(ENDPOINT_REVIEWS,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, response);
                         JsonElement resultArray = gson.fromJson(response, JsonObject.class).get("results");
-                        List<ReviewInfo> infos = Arrays.asList(gson.fromJson(resultArray, ReviewInfo[].class));
-                        reviewAdapter.setReviewInfos(infos);
+                        List<ReviewInfo> info = Arrays.asList(gson.fromJson(resultArray, ReviewInfo[].class));
+                        reviewAdapter.setReviewInfo(info);
                     }
                 }
         );
     }
 
-    private void updateList(final String endpoint, final RecyclerView.Adapter adapter, Response.Listener<String> responseListener) {
+    private void updateList(final String endpoint, Response.Listener<String> responseListener) {
         MovieDetails movieDetails = mBinding.getMovieDetails();
         String url = SharedConstants.BASE_URL + "movie/" + Integer.toString(movieDetails.id) + "/" + endpoint + "?" + api_key;
         Log.d(TAG, url);
@@ -170,14 +170,14 @@ public class DetailActivity extends AppCompatActivity {
                 detailsUri,
                 null, null, null, null);
         if (details != null && details.getCount() > 0) {
-            mBinding.btFavorite.setText(R.string.unmark_as_favorite);
+            mBinding.btFavorite.setText(R.string.remove_from_favorites);
         } else {
             mBinding.btFavorite.setText(R.string.mark_as_favorite);
         }
         if (details != null) details.close();
     }
 
-    public void flipFavourite(View view) {
+    public void flipFavourite(@SuppressWarnings("unused") View view) { // parameter is passed by the framework (function used in layout xml)
         MovieDetails movieDetails = mBinding.getMovieDetails();
         ContentResolver resolver = getContentResolver();
         Uri detailsUri = FavoriteMoviesContract.BASE_CONTENT_URI.buildUpon().appendPath(FavoriteMoviesContract.PATH_MOVIE).appendPath(Integer.toString(movieDetails.id)).build();

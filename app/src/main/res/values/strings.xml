@@ -3,7 +3,7 @@
     <string name="detail_activity_name">Movie Details</string>
     <string name="default_poster_description">Movie poster</string>
     <string name="mark_as_favorite">Mark as Favorite</string>
-    <string name="unmark_as_favorite">Remove from Favorites</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
     <string name="favorite_added">%s added as favourite</string>
     <string name="favorite_removed">%s removed from favourites</string>
     <string name="title_activity_settings">Settings</string>

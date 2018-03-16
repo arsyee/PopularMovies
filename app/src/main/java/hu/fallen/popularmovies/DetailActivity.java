@@ -1,7 +1,10 @@
 package hu.fallen.popularmovies;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +30,7 @@ import java.util.List;
 
 import hu.fallen.popularmovies.adapters.ReviewInfo;
 import hu.fallen.popularmovies.adapters.TrailerAdapter;
+import hu.fallen.popularmovies.database.FavoriteMoviesContract;
 import hu.fallen.popularmovies.database.FavoriteMoviesDbHelper;
 import hu.fallen.popularmovies.databinding.ActivityDetailBinding;
 import hu.fallen.popularmovies.utilities.BitmapLruCache;
@@ -81,7 +85,7 @@ public class DetailActivity extends AppCompatActivity {
         mBinding.ivPoster.setContentDescription(getString(R.string.poster_description, mMovieDetails.original_title));
         api_key = "api_key=" + getString(R.string.tmdb_api_key);
         updateRuntime();
-        updateFavourite();
+        updateFavorite();
 
         trailerAdapter = new TrailerAdapter(DetailActivity.this);
         final RecyclerView trailers = mBinding.rvTrailers;
@@ -158,14 +162,19 @@ public class DetailActivity extends AppCompatActivity {
         mRequestQueue.add(movieRequest);
     }
 
-    private void updateFavourite() {
+    private void updateFavorite() {
         MovieDetails movieDetails = mBinding.getMovieDetails();
-        FavoriteMoviesDbHelper dbHelper = new FavoriteMoviesDbHelper(this);
-        if (dbHelper.movieDetailsIsInDB(movieDetails.id)) {
+        ContentResolver resolver = getContentResolver();
+        Uri detailsUri = FavoriteMoviesContract.BASE_CONTENT_URI.buildUpon().appendPath(FavoriteMoviesContract.PATH_MOVIE).appendPath(Integer.toString(movieDetails.id)).build();
+        Cursor details = resolver.query(
+                detailsUri,
+                null, null, null, null);
+        if (details != null && details.getCount() > 0) {
             mBinding.btFavorite.setText(R.string.unmark_as_favorite);
         } else {
             mBinding.btFavorite.setText(R.string.mark_as_favorite);
         }
+        if (details != null) details.close();
     }
 
     public void flipFavourite(View view) {
@@ -175,7 +184,7 @@ public class DetailActivity extends AppCompatActivity {
         } else {
             showToast(getResources().getString(R.string.favorite_removed, mMovieDetails.original_title));
         }
-        updateFavourite();
+        updateFavorite();
     }
 
     private void showToast(String message) {

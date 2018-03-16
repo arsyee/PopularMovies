@@ -1,14 +1,13 @@
 package hu.fallen.popularmovies;
 
-import android.content.AsyncTaskLoader;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import hu.fallen.popularmovies.database.FavoriteMoviesContract;
-import hu.fallen.popularmovies.database.FavoriteMoviesDbHelper;
 import hu.fallen.popularmovies.utilities.BitmapLruCache;
 import hu.fallen.popularmovies.utilities.ImageAdapter;
 import hu.fallen.popularmovies.utilities.MovieDetails;

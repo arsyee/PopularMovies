@@ -40,13 +40,28 @@ public class MoviesContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         int match = sUriMatcher.match(uri);
+        Cursor cursor = null;
         switch (match) {
             case FAVORITE:
-                Cursor cursor = db.query(
+                cursor = db.query(
                         FavoriteMoviesContract.MovieEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                return cursor;
+            case MOVIE_WITH_ID:
+                String id = uri.getLastPathSegment();
+                String mSelection = FavoriteMoviesContract.MovieEntry.COLUMN_NAME_ID + "=?";
+                String[] mSelectionArgs = new String[]{id};
+                cursor = db.query(
+                        FavoriteMoviesContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        mSelection,
+                        mSelectionArgs,
                         null,
                         null,
                         sortOrder

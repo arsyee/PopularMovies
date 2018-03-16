@@ -1,5 +1,6 @@
 package hu.fallen.popularmovies.utilities;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -43,6 +44,7 @@ public class MovieDetails implements Parcelable {
         vote_average = in.readDouble();
     }
 
+    @SuppressLint("DefaultLocale") // only used for debugging
     @Override
     public String toString() {
         return String.format("%d %f %s %s %s %s", id, vote_average, original_title, release_date, poster_path, overview);

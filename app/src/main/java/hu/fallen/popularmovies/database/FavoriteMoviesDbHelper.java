@@ -19,6 +19,9 @@ class FavoriteMoviesDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Dropping table, because application was never rolled out, there are no users with
+        // meaningful data saved on their devices, and I don't even remember what was the version 1
+        // DB structure.
         db.execSQL(FavoriteMoviesContract.SQL_DELETE_ENTRIES);
         onCreate(db);
     }

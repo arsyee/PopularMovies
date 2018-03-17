@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -91,33 +92,56 @@ public class DetailActivity extends AppCompatActivity {
         final RecyclerView trailers = mBinding.rvTrailers;
         trailers.setLayoutManager(new LinearLayoutManager(DetailActivity.this));
         trailers.setAdapter(trailerAdapter);
-        updateList(ENDPOINT_VIDEOS,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG, response);
-                        JsonElement resultArray = gson.fromJson(response, JsonObject.class).get("results");
-                        List<TrailerInfo> info = Arrays.asList(gson.fromJson(resultArray, TrailerInfo[].class));
-                        trailerAdapter.setTrailerInfo(info);
+        if (savedInstanceState != null && savedInstanceState.containsKey(ENDPOINT_VIDEOS)) {
+            ArrayList<TrailerInfo> info = savedInstanceState.getParcelableArrayList(ENDPOINT_VIDEOS);
+            trailerAdapter.setTrailerInfo(info);
+        } else {
+            updateList(ENDPOINT_VIDEOS,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d(TAG, response);
+                            JsonElement resultArray = gson.fromJson(response, JsonObject.class).get("results");
+                            List<TrailerInfo> infoGSONIsTrickyAgain = Arrays.asList(gson.fromJson(resultArray, TrailerInfo[].class));
+                            ArrayList<TrailerInfo> info = new ArrayList<>();
+                            info.addAll(infoGSONIsTrickyAgain);
+                            trailerAdapter.setTrailerInfo(info);
+                            trailerAdapter.notifyDataSetChanged();
+                        }
                     }
-                }
-        );
+            );
+        }
 
         reviewAdapter = new ReviewAdapter();
         final RecyclerView reviews = mBinding.rvReviews;
         reviews.setLayoutManager(new LinearLayoutManager(DetailActivity.this));
         reviews.setAdapter(reviewAdapter);
-        updateList(ENDPOINT_REVIEWS,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG, response);
-                        JsonElement resultArray = gson.fromJson(response, JsonObject.class).get("results");
-                        List<ReviewInfo> info = Arrays.asList(gson.fromJson(resultArray, ReviewInfo[].class));
-                        reviewAdapter.setReviewInfo(info);
+        if (savedInstanceState != null && savedInstanceState.containsKey(ENDPOINT_REVIEWS)) {
+            ArrayList<ReviewInfo> info = savedInstanceState.getParcelableArrayList(ENDPOINT_REVIEWS);
+            reviewAdapter.setReviewInfo(info);
+        } else {
+            updateList(ENDPOINT_REVIEWS,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d(TAG, response);
+                            JsonElement resultArray = gson.fromJson(response, JsonObject.class).get("results");
+                            List<ReviewInfo> infoGsonList = Arrays.asList(gson.fromJson(resultArray, ReviewInfo[].class));
+                            ArrayList<ReviewInfo> info = new ArrayList<>();
+                            info.addAll(infoGsonList);
+                            reviewAdapter.setReviewInfo(info);
+                            reviewAdapter.notifyDataSetChanged();
+                        }
                     }
-                }
-        );
+            );
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(ENDPOINT_VIDEOS, trailerAdapter.getTrailerInfo());
+        outState.putParcelableArrayList(ENDPOINT_REVIEWS, reviewAdapter.getReviewInfo());
     }
 
     private void updateList(final String endpoint, Response.Listener<String> responseListener) {

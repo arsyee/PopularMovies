@@ -6,9 +6,11 @@
         <variable name="movieDetails" type="hu.fallen.popularmovies.utilities.MovieDetails" />
     </data>
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nsv_level1"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <android.support.constraint.ConstraintLayout
+            android:id="@+id/cl_level2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingBottom="16dp"

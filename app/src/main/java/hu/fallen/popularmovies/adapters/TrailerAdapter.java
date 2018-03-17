@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import hu.fallen.popularmovies.R;
@@ -24,15 +26,14 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
 
     private final Context mContext;
 
-    private List<TrailerInfo> mTrailerInfo;
+    private ArrayList<TrailerInfo> mTrailerInfo;
 
     public TrailerAdapter(Context context) {
         mContext = context.getApplicationContext();
     }
 
-    public void setTrailerInfo(List<TrailerInfo> trailerInfo) {
+    public void setTrailerInfo(ArrayList<TrailerInfo> trailerInfo) {
         mTrailerInfo = trailerInfo;
-        notifyDataSetChanged();
     }
 
     @Override
@@ -88,6 +89,10 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
     @Override
     public int getItemViewType(int i) {
         return i % 2 == 0 ? VIEW_TYPE_TRAILER : VIEW_TYPE_SEPARATOR;
+    }
+
+    public ArrayList<TrailerInfo> getTrailerInfo() {
+        return mTrailerInfo;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

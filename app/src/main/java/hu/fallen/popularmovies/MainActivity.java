@@ -50,8 +50,6 @@ public class MainActivity extends AppCompatActivity
     private final Gson gson = new Gson();
     private SharedPreferences preferences;
 
-    private static final String SCROLL_POSITION = "scroll_position";
-    private int savedScrollPosition = -1;
     private static final String MOVIE_LIST = "movie_list";
     private GridView movies;
 
@@ -77,20 +75,12 @@ public class MainActivity extends AppCompatActivity
         adapter = new ImageAdapter(this, mImageLoader, movieList);
         if (adapter.getMovieList() == null) reinitializeAdapter();
         movies.setAdapter(adapter);
-        if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
-            savedScrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
-            movies.smoothScrollToPosition(savedScrollPosition);
-            Log.d(TAG, String.format("Loading position: %d (%d)", savedScrollPosition, movies.getCount()));
-        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.i(TAG, "LIFECYCLE: onSaveInstanceState()");
         if (movies != null) {
-            int position = movies.getFirstVisiblePosition();
-            outState.putInt(SCROLL_POSITION, position);
-            Log.d(TAG, String.format("Saving scroll position: %d", position));
             outState.putParcelableArrayList(MOVIE_LIST, adapter.getMovieList());
         } else {
             Log.d(TAG, "GridView not fount");
@@ -194,16 +184,6 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-            case R.id.scroll_saved:
-                if (savedScrollPosition < 0) return true; // don't scroll
-                movies.smoothScrollToPosition(savedScrollPosition);
-                Log.d(TAG, String.format("Jumping to position: %d (%d)", savedScrollPosition, movies.getCount()));
-                return true;
-            case R.id.scroll_down:
-                int position = movies.getCount();
-                movies.smoothScrollToPosition(position);
-                Log.d(TAG, String.format("Jumping to position: %d (%d)", position, movies.getCount()));
                 return true;
         }
         return super.onOptionsItemSelected(item);

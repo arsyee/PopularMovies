@@ -29,4 +29,6 @@
     <string name="play_button">Play button</string>
     <string name="movie_not_found">Movie not found</string>
     <string name="reviews">Reviews</string>
+    <string name="scroll_down">Jump to bottom</string>
+    <string name="scroll_saved">Jump to saved</string>
 </resources>

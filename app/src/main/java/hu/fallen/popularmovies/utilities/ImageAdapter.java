@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import hu.fallen.popularmovies.DetailActivity;
 import hu.fallen.popularmovies.R;
@@ -24,15 +24,21 @@ public class ImageAdapter extends BaseAdapter {
     private final Context mContext;
     private final ImageLoader mImageLoader;
 
-    private List<MovieDetails> movieList = null;
+    private ArrayList<MovieDetails> movieList;
 
-    public ImageAdapter(Context context, ImageLoader imageLoader) {
+    public ImageAdapter(Context context, ImageLoader imageLoader, ArrayList<MovieDetails> movieList) {
         mContext = context.getApplicationContext();
         mImageLoader = imageLoader;
+        setMovieList(movieList);
     }
 
-    public void setMovieList(List<MovieDetails> movieList) {
+    public void setMovieList(ArrayList<MovieDetails> movieList) {
         this.movieList = movieList;
+        notifyDataSetChanged();
+    }
+
+    public ArrayList<MovieDetails> getMovieList() {
+        return movieList;
     }
 
     @Override
@@ -82,7 +88,7 @@ public class ImageAdapter extends BaseAdapter {
         // setup unique properties
         if (movieList != null && movieList.size() > i) {
             final MovieDetails movieDetails = (MovieDetails) getItem(i);
-            Log.d(TAG, String.format("Drawing %s", movieDetails));
+            // Log.d(TAG, String.format("Drawing %s", movieDetails));
             networkImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -118,9 +124,4 @@ public class ImageAdapter extends BaseAdapter {
         return movieList == null || movieList.isEmpty();
     }
 
-    @Override
-    public void notifyDataSetChanged() {
-        Log.d(TAG, String.format("notifyDataSetChanged() called, list size: %d", movieList == null ? -1 : movieList.size()));
-        super.notifyDataSetChanged();
-    }
 }

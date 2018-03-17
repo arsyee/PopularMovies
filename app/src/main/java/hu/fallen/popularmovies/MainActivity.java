@@ -50,8 +50,14 @@ public class MainActivity extends AppCompatActivity
     private final Gson gson = new Gson();
     private SharedPreferences preferences;
 
+    private static final String SCROLL_POSITION = "scroll_position";
+    private int savedScrollPosition = -1;
+    private static final String MOVIE_LIST = "movie_list";
+    private GridView movies;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
+        Log.i(TAG, "LIFECYCLE: onCreate()");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -60,32 +66,54 @@ public class MainActivity extends AppCompatActivity
 
         api_key = "api_key=" + getString(R.string.tmdb_api_key);
 
-        final GridView movies = findViewById(R.id.gr_movies);
-        adapter = new ImageAdapter(this, mImageLoader);
-        movies.setAdapter(adapter);
-
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences.registerOnSharedPreferenceChangeListener(this);
+
+        movies = findViewById(R.id.gr_movies);
+        ArrayList<MovieDetails> movieList = null;
+        if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE_LIST)) {
+            movieList = savedInstanceState.getParcelableArrayList(MOVIE_LIST);
+        }
+        adapter = new ImageAdapter(this, mImageLoader, movieList);
+        if (adapter.getMovieList() == null) reinitializeAdapter();
+        movies.setAdapter(adapter);
+        if (savedInstanceState != null && savedInstanceState.containsKey(SCROLL_POSITION)) {
+            savedScrollPosition = savedInstanceState.getInt(SCROLL_POSITION);
+            movies.smoothScrollToPosition(savedScrollPosition);
+            Log.d(TAG, String.format("Loading position: %d (%d)", savedScrollPosition, movies.getCount()));
+        }
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        refreshMovies();
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.i(TAG, "LIFECYCLE: onSaveInstanceState()");
+        if (movies != null) {
+            int position = movies.getFirstVisiblePosition();
+            outState.putInt(SCROLL_POSITION, position);
+            Log.d(TAG, String.format("Saving scroll position: %d", position));
+            outState.putParcelableArrayList(MOVIE_LIST, adapter.getMovieList());
+        } else {
+            Log.d(TAG, "GridView not fount");
+        }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
+        Log.i(TAG, "LIFECYCLE: onDestroy()");
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        refreshMovies();
+        Log.i(TAG, "LIFECYCLE: onSharedPreferenceChanged()");
+        movies.smoothScrollToPosition(0);
+        reinitializeAdapter();
     }
 
-    private void refreshMovies() {
+    private void reinitializeAdapter() {
+        Log.d(TAG, "reinitializeAdapter() called");
         String sort_by;
         String prefSortBy = preferences.getString("sort_by", "popular");
         switch (prefSortBy) {
@@ -112,7 +140,7 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
             Log.d(TAG, String.format("ContentResolver returned %d favorites", favorites.getCount()));
-            List<MovieDetails> movieDetails = new ArrayList<>();
+            ArrayList<MovieDetails> movieDetails = new ArrayList<>();
             try {
                 while (favorites.moveToNext()) {
                     movieDetails.add(new MovieDetails(
@@ -128,7 +156,6 @@ public class MainActivity extends AppCompatActivity
                 favorites.close();
             }
             adapter.setMovieList(movieDetails);
-            adapter.notifyDataSetChanged();
         } else {
             String url = SharedConstants.BASE_URL_MOVIE + sort_by + "?" + api_key;
             Log.d(TAG, url);
@@ -139,9 +166,10 @@ public class MainActivity extends AppCompatActivity
                         public void onResponse(String response) {
                             Log.d(TAG, response);
                             JsonElement resultArray = gson.fromJson(response, JsonObject.class).get("results");
-                            List<MovieDetails> movieList = Arrays.asList(gson.fromJson(resultArray, MovieDetails[].class));
+                            List<MovieDetails> movieListWhateverTypeGsonHappensToProvide = Arrays.asList(gson.fromJson(resultArray, MovieDetails[].class));
+                            ArrayList<MovieDetails> movieList = new ArrayList<>();
+                            movieList.addAll(movieListWhateverTypeGsonHappensToProvide);
                             adapter.setMovieList(movieList);
-                            adapter.notifyDataSetChanged();
                         }
                     },
                     new Response.ErrorListener() {
@@ -166,6 +194,16 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.scroll_saved:
+                if (savedScrollPosition < 0) return true; // don't scroll
+                movies.smoothScrollToPosition(savedScrollPosition);
+                Log.d(TAG, String.format("Jumping to position: %d (%d)", savedScrollPosition, movies.getCount()));
+                return true;
+            case R.id.scroll_down:
+                int position = movies.getCount();
+                movies.smoothScrollToPosition(position);
+                Log.d(TAG, String.format("Jumping to position: %d (%d)", position, movies.getCount()));
                 return true;
         }
         return super.onOptionsItemSelected(item);

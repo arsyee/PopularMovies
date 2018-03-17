@@ -5,4 +5,12 @@
         android:id="@+id/settings"
         android:title="@string/settings"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/scroll_saved"
+        android:title="@string/scroll_saved"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/scroll_down"
+        android:title="@string/scroll_down"
+        app:showAsAction="never" />
 </menu>

@@ -2,7 +2,10 @@ package hu.fallen.popularmovies.utilities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -15,6 +18,7 @@ import com.android.volley.toolbox.NetworkImageView;
 import java.util.ArrayList;
 
 import hu.fallen.popularmovies.DetailActivity;
+import hu.fallen.popularmovies.MainActivity;
 import hu.fallen.popularmovies.R;
 
 public class ImageAdapter extends BaseAdapter {
@@ -23,11 +27,13 @@ public class ImageAdapter extends BaseAdapter {
 
     private final Context mContext;
     private final ImageLoader mImageLoader;
+    private final LayoutInflater mInflater;
 
     private ArrayList<MovieDetails> movieList;
 
-    public ImageAdapter(Context context, ImageLoader imageLoader, ArrayList<MovieDetails> movieList) {
+    public ImageAdapter(MainActivity context, ImageLoader imageLoader, ArrayList<MovieDetails> movieList) {
         mContext = context.getApplicationContext();
+        mInflater = context.getLayoutInflater();
         mImageLoader = imageLoader;
         setMovieList(movieList);
     }
@@ -76,15 +82,13 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
-        NetworkImageView networkImageView;
-        if (view == null) { // create a new NetworkImageView and setup properties
-            networkImageView = new NetworkImageView(mContext);
-            networkImageView.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            networkImageView.setAdjustViewBounds(true);
-            networkImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        } else { // recycle view, we don't need to set common properties
-            networkImageView = (NetworkImageView) view;
+        ConstraintLayout constraintLayout;
+        if (view == null) {
+            constraintLayout = (ConstraintLayout) mInflater.inflate(R.layout.poster_layout, viewGroup, false);
+        } else {
+            constraintLayout = (ConstraintLayout) view;
         }
+        NetworkImageView networkImageView = (NetworkImageView) constraintLayout.getChildAt(0);
         // setup unique properties
         if (movieList != null && movieList.size() > i) {
             final MovieDetails movieDetails = (MovieDetails) getItem(i);
@@ -106,7 +110,7 @@ public class ImageAdapter extends BaseAdapter {
             networkImageView.setImageUrl(null, null);
             Log.d(TAG, String.format("movieList is empty for %d", i));
         }
-        return networkImageView;
+        return constraintLayout;
     }
 
     @Override

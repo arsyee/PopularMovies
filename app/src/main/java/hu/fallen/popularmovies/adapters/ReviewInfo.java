@@ -3,7 +3,8 @@ package hu.fallen.popularmovies.adapters;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-@SuppressWarnings({"WeakerAccess", "unused"}) // public access required for Data Binding and GSON
+@SuppressWarnings({"WeakerAccess", "unused", "CanBeFinal"})
+// public access required for Data Binding and GSON
 public class ReviewInfo implements Parcelable {
     public String id;
     public String author;
